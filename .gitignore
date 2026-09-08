@@ -1,43 +1,39 @@
-# ==============================================================================
 # Python
-# ==============================================================================
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-*.egg-info/
-dist/
-build/
-*.egg
+*.pyo
+*.pyd
 
-# ==============================================================================
-# Dataset & Model Artifacts (do NOT commit large files)
-# ==============================================================================
-data/
-checkpoints/
-outputs/
-
-# ==============================================================================
-# IDE & OS
-# ==============================================================================
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-Thumbs.db
-.DS_Store
-
-# ==============================================================================
-# Virtual Environments
-# ==============================================================================
+# Environments
 venv/
-.env/
 env/
 .venv/
 
-# ==============================================================================
-# Misc
-# ==============================================================================
-*.log
-.env
+# Dataset / large binary artifacts (keep repo lean)
+dataset/
+*.tflite
+
+# Committed: models/ and results/ contain trained artifacts for reproduction
+!models/*.keras
+!models/class_names.json
+!results/*.png
+
+# Gradio / Jupyter
+.ipynb_checkpoints/
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+*_log.txt
+*_err.txt
+demo_e.txt
+demo_out.txt
+hybrid_e*.txt
+hybrid_err*.txt
+
+# Unrelated projects that live in the same workspace folder
+outputs/
+reports/
+railway_track_detection/

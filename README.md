@@ -1,316 +1,192 @@
-# AI-Based Crop Disease Detection and Health Monitoring System
+# 🌿 Intelligent Plant Leaf Disease Detection
 
-Using Image Processing and Deep Learning for automated plant disease identification, explainability, severity assessment, progression forecasting, and treatment recommendations.
-
-## Project Pipeline
-
-```
-Image Input
-    ↓
-Image Preprocessing (BilateralFilter + VegetationIndices)
-    ↓
-Disease Localization / Segmentation (Aryaahi)
-    ↓
-Disease Classification (Sravani / Dominic)
-    ↓
-Severity Estimation (Aryaahi)
-    ↓
-XAI / Grad-CAM (Vidhi)
-    ↓
-Disease Progression Forecasting (Vidhi)
-    ↓
-Treatment Recommendation (Vidhi)
-    ↓
-Final Decision-Support Output (Vidhi)
-```
-
-## Team Members
-
-| Member | Module | Location |
-|--------|--------|----------|
-| **Sravani** | Classification model | `src/` |
-| **Dominic** | CNN-ViT hybrid classification model | `src/hybrid_model.py` |
-| **Aryaahi** | Leaf/disease segmentation & severity mask | TBD |
-| **Vidhi** | XAI + Forecasting + Recommendation | `src/xai_module/` |
+**Course:** Image and Video Analytics (IVA) — CIA 3
+**Objective 3:** Develop an intelligent deep learning-based system for accurate
+plant leaf disease detection using leaf images and improve crop health through
+early disease identification.
 
 ---
 
-## Repository Structure
+## 📌 Objective Fulfilment
 
-```
-AI-Crop-Disease-Detection/
-├── src/
-│   ├── hybrid_model.py              # MobileNetV3-ViT hybrid classifier (Dominic)
-│   ├── data_loader.py               # PlantVillage dataset loader
-│   ├── train.py                     # Training script
-│   ├── inference.py                 # Single-image inference
-│   ├── evaluate_metrics.py          # Validation metrics
-│   └── xai_module/                  # Vidhi's XAI module
-│       ├── __init__.py
-│       ├── config.py                # All configurable thresholds & rules
-│       ├── gradcam.py               # Grad-CAM explainability engine
-│       ├── severity_utils.py        # Severity calculation & categorization
-│       ├── disease_forecasting.py   # Progression forecasting
-│       ├── treatment_recommender.py # Treatment recommendation engine
-│       ├── decision_support.py      # Unified output integrator
-│       └── mock_utils.py            # Mock data generators [MOCK]
-├── tests/
-│   ├── test_gradcam.py
-│   ├── test_severity.py
-│   ├── test_forecasting.py
-│   └── test_recommendation.py
-├── examples/
-│   └── demo_pipeline.py             # End-to-end demo script
-├── checkpoints/                     # Model weights (gitignored)
-├── data/                            # Dataset (gitignored)
-│   └── raw/color/                   # PlantVillage images
-├── outputs/                         # Generated outputs (gitignored)
-├── .gitignore
-├── requirements.txt
-└── README.md
-```
+This project delivers a complete deep-learning pipeline that:
+
+1. **Ingests leaf images** of crops from multiple species.
+2. **Detects & classifies diseases** (bacterial, fungal, viral) vs. healthy leaves.
+3. **Explains predictions** with Grad-CAM heatmaps (interpretable AI).
+4. **Exposes a real-world web interface** (Gradio) for farmer/usability testing.
+5. **Reports** accuracy, confusion matrix, ROC curves, and per-class metrics.
 
 ---
 
-## Setup
+## 📊 Recommended Dataset (Kaggle)
 
-### 1. Clone and switch to the feature branch
+**Primary (full, 38 classes):**
+- **New Plant Diseases Dataset** — *vipoooool*
+- https://www.kaggle.com/datasets/vipoooool/new-plant-diseases-dataset
+- Derived from the PlantVillage dataset. ~87k images across 38 crop-disease
+  classes, already split into `train` / `valid`.
 
-```bash
-git clone https://github.com/Vidhi-Garg11/AI-Crop-Disease-Detection.git
-cd AI-Crop-Disease-Detection
-git checkout feature/vidhi-xai
+**Optional test images:**
+- **Plant Disease Detection - Test Set Images**
+- https://www.kaggle.com/datasets/emmarex/plantdisease
+
+**How to set it up:**
+1. Create a Kaggle account and accept the dataset terms.
+2. Download and unzip. Locate the folder
+   `New Plant Diseases Dataset (Augmented)` which contains `train` and `valid`.
+3. Place it inside this project under `dataset/`, or point the script to it:
+
+   ```python
+   DATASET_PATH = r"C:\path\to\New Plant Diseases Dataset (Augmented)"
+   ```
+
+Expected tree:
+
+```
+dataset/
+  train/
+    Apple___Apple_scab/
+    Apple___Black_rot/
+    ...
+  valid/
+    ...
 ```
 
-### 2. Create a virtual environment (recommended)
+### ⚡ Automatic download (recommended)
 
 ```bash
+pip install kagglehub          # already in requirements.txt
+python download_dataset.py
+```
+
+This downloads the dataset via `kagglehub`, copies `train/` + `valid/` straight
+into `dataset/`, and verifies class/image counts. No manual unzip needed.
+(A Kaggle login may be requested on first use.)
+
+---
+
+## 🚀 Installation
+
+```bash
+# Create & activate a virtual environment (recommended)
 python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # macOS/Linux
 
-# Windows
-venv\Scripts\activate
-
-# Linux/Mac
-source venv/bin/activate
-```
-
-### 3. Install dependencies
-
-```bash
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 4. Dataset setup
-
-Download the PlantVillage dataset from Kaggle:
-- **URL**: https://www.kaggle.com/datasets/siddhantsadangi/plantvillagedataset?select=raw
-- Extract into `data/raw/color/` so the structure is:
-  ```
-  data/raw/color/
-  ├── Apple___Apple_scab/
-  ├── Apple___Black_rot/
-  ├── Tomato___Late_blight/
-  └── ... (38 class directories)
-  ```
-- **Do NOT** commit the dataset to Git (it is gitignored).
-
-### 5. Model checkpoint
-
-Ensure the trained model checkpoint exists at:
-```
-checkpoints/hybrid_model_best.pth
-```
-
-This checkpoint is produced by `src/train.py` and contains `model_state_dict` and `classes`.
+If you have no GPU and would like faster installs,
+`pip install tensorflow-cpu` is also an option.
 
 ---
 
-## Running the XAI Pipeline
+## ▶️ How to Run
 
-### Full demo (end-to-end pipeline)
+### Option A — Full training (38 classes, needs a GPU)
 
 ```bash
-python examples/demo_pipeline.py
+python plant_disease_detection.py
 ```
 
-With custom paths:
+Prompts at the end let you also launch the Gradio web app.
+
+### Option B — Quick training (subclassed subset, runs on CPU/laptop)
+
+Edit `SUBSET_CLASSES` in `plant_disease_detection_quick.py`, then:
 
 ```bash
-python examples/demo_pipeline.py --checkpoint checkpoints/hybrid_model_best.pth --image data/test_image.JPG --output-dir outputs
+python plant_disease_detection_quick.py
 ```
 
-### Run tests
+This trains a transfer-learning model on a handful of classes in minutes.
+
+### Option C — Real-time Web Demo
 
 ```bash
-python -m pytest tests/ -v
+python run_demo.py          # loads trained model, opens http://127.0.0.1:7860
+```
+
+Or answer `y` at the end of the training scripts to launch the demo
+automatically.
+
+### Option D — Hybrid-backend Web Demo (MobileNetV3 + Vision Transformer)
+
+A second, more advanced backend is included, adapted from
+[Vidhi-Garg11/AI-Crop-Disease-Detection](https://github.com/Vidhi-Garg11/AI-Crop-Disease-Detection).
+It serves predictions from a pretrained **25-class** PyTorch checkpoint
+(`hybrid/hybrid_model_best.pth`) using the same style of upload UI.
+
+```bash
+# one-time setup (CPU wheels)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+
+python run_demo_hybrid.py   # opens http://127.0.0.1:7860
+```
+
+Model: MobileNetV3-Large CNN → 1×1 projection → positional embeddings →
+2 transformer encoder blocks → classification head (3.7M params).
+Preprocessing: bilateral filter → vegetation indices (ExG/ExR) →
+ImageNet normalization. See `hybrid/hybrid_backend.py`.
+
+---
+
+## 🧠 Models Included
+
+| Backbone      | Type                 | Speed/Resource | Accuracy (typical) |
+|---------------|----------------------|----------------|--------------------|
+| Custom CNN    | From scratch         | Fast, light    | ~70–85%           |
+| MobileNetV2   | Transfer learning    | Fast, light    | ~95%+             |
+| EfficientNetB0| Transfer learning    | Medium         | ~96%+             |
+| VGG16         | Transfer learning    | Heavy          | ~95%+             |
+| ResNet50      | Transfer learning    | Heavy          | ~96%+             |
+| DenseNet121   | Transfer learning    | Heavy          | ~97%+             |
+
+Change `MODEL_BACKBONE` at the top of `plant_disease_detection.py`.
+
+---
+
+## 📁 Outputs (saved in `results/` and `models/`)
+
+```
+results/
+  training_curve_<model>.png
+  confusion_matrix_<model>.png
+  roc_curve_<model>.png
+  gradcam_<model>.png
+models/
+  best_<model>.keras
+  plant_disease_<model>_final.keras
 ```
 
 ---
 
-## XAI Module Components
+## 🔬 Features Delivered
 
-### 1. Grad-CAM (`src/xai_module/gradcam.py`)
-
-Architecture-agnostic Grad-CAM implementation that works with ResNet, EfficientNet, MobileNet, and the project's MobileNetViTHybrid.
-
-```python
-from xai_module.gradcam import GradCAM, get_target_layer
-
-# Auto-detect target layer
-target_layer = get_target_layer(model)
-
-# Generate heatmap
-gradcam = GradCAM(model, target_layer)
-heatmap = gradcam.generate(input_tensor, target_class=predicted_idx)
-overlay = gradcam.overlay(heatmap, original_image)
-gradcam.remove_hooks()
-```
-
-### 2. Severity Integration (`src/xai_module/severity_utils.py`)
-
-Calculates disease severity from segmentation masks or accepts pre-computed percentages.
-
-```python
-from xai_module.severity_utils import build_severity_result
-
-# From upstream segmentation module
-result = build_severity_result(
-    severity_percentage=37.5,  # OR infected_mask=mask
-)
-# → SeverityResult(percentage=37.5, level="Moderate", source="direct")
-```
-
-### 3. Disease Forecasting (`src/xai_module/disease_forecasting.py`)
-
-Predicts future severity from historical observations using linear or exponential models.
-
-```python
-from xai_module.disease_forecasting import forecast_severity
-
-history = [(1, 10), (3, 18), (5, 31), (7, 45)]
-result = forecast_severity(history, future_days=7, method="linear")
-# → ForecastResult(trend="Increasing", forecast=[(8, 52.3), ...], ...)
-```
-
-### 4. Treatment Recommendation (`src/xai_module/treatment_recommender.py`)
-
-Rule-based recommendation engine with disease-specific and generic fallback rules.
-
-```python
-from xai_module.treatment_recommender import generate_recommendation
-
-rec = generate_recommendation(
-    disease_class="Tomato___Late_blight",
-    severity_percentage=37.5,
-    severity_level="Moderate",
-    trend="Increasing",
-    confidence=0.94,
-)
-```
-
-### 5. Decision Support Output (`src/xai_module/decision_support.py`)
-
-Combines all pipeline outputs into a single structured JSON result.
-
-### 6. Configuration (`src/xai_module/config.py`)
-
-All configurable values in one file:
-- Severity thresholds (0–10% Low, 10–30% Mild, 30–60% Moderate, 60–100% Severe)
-- Treatment rules per disease
-- Forecasting parameters
-- Monitoring recommendations
-- Disclaimer text
+- **Image augmentation** (rotation, flips, zoom, brightness) — improves
+  generalization to real field conditions.
+- **Early disease identification** — model classifies before symptoms get
+  severe, enabling timely intervention.
+- **Grad-CAM interpretability** — shows *where* in the leaf the model sees
+  disease (builds trust / supports agronomists).
+- **Full evaluation** — accuracy, classification report, confusion matrix,
+  ROC curves.
+- **Web UI** — farmers/agronomists upload a leaf photo and get a diagnosis.
 
 ---
 
-## Integration Guide for Team Members
+## ⚠️ Notes
 
-### For Sravani & Dominic (Classification)
-
-Your classification model should produce:
-
-```python
-classification_output = {
-    "predicted_class": "Tomato___Late_blight",  # PlantVillage class label
-    "confidence": 0.94,                         # float, 0–1
-    "model": trained_pytorch_model,              # nn.Module in eval mode
-}
-```
-
-The XAI module will use `model` for Grad-CAM and `predicted_class`/`confidence` for downstream processing.
-
-### For Aryaahi (Segmentation / Severity)
-
-Your segmentation module should produce:
-
-```python
-severity_output = {
-    "severity_mask": np.ndarray,          # binary mask (H, W), 1 = infected
-    "leaf_mask": np.ndarray or None,      # optional leaf-region mask
-    "severity_percentage": float,         # pre-computed severity %
-}
-```
-
-Either `severity_mask` or `severity_percentage` can be provided. If both are given, the pre-computed percentage is used directly.
-
-### Replacing mock components
-
-When real upstream modules are ready:
-
-1. Replace calls to `mock_utils.create_mock_classification_output()` with the real classification output.
-2. Replace calls to `mock_utils.create_mock_severity_output()` with the real segmentation output.
-3. Replace calls to `mock_utils.create_mock_severity_history()` with real temporal severity data (if available).
-
-All mock functions are in `src/xai_module/mock_utils.py` and clearly labeled with `[MOCK]`.
+- Training on the **full 38-class dataset** with a heavy backbone requires a GPU
+  (comments in code split by resource). The quick variant is CPU-friendly.
+- Dataset is CC BY / research licensed — cite PlantVillage and the Kaggle
+  author if you publish.
+- Model predictions aid diagnosis but should be confirmed by agronomists.
 
 ---
 
-## Example Output
+## ✍️ Author
 
-The pipeline produces a JSON decision-support file like:
-
-```json
-{
-  "prediction": {
-    "disease": "Tomato___Late_blight",
-    "confidence": 0.94
-  },
-  "severity": {
-    "percentage": 37.5,
-    "level": "Moderate",
-    "source": "mock"
-  },
-  "explainability": {
-    "method": "Grad-CAM",
-    "gradcam_overlay": "outputs/gradcam_overlay.png"
-  },
-  "forecast": {
-    "trend": "Increasing",
-    "risk_level": "High",
-    "future_severity": [
-      {"day": 8, "predicted_severity": 52.3},
-      {"day": 9, "predicted_severity": 58.7}
-    ]
-  },
-  "recommendation": {
-    "action": "Isolate severely affected plants...",
-    "monitoring": "Inspect plants daily...",
-    "warning": "AI-generated recommendation; consult an agricultural expert..."
-  }
-}
-```
-
----
-
-## Important Notes
-
-- **Severity thresholds** are project-defined defaults, NOT agriculturally validated. They can be adjusted in `config.py`.
-- **Treatment recommendations** are high-level best practices. No specific chemical dosages are provided.
-- **Mock data** is clearly labeled `[MOCK]` throughout. Do not use mock outputs in production.
-- **PlantVillage** does not provide severity annotations, time-series data, or segmentation masks. All such data used during development is synthetic.
-
----
-
-## License
-
-This project is for academic purposes as part of the AI-Based Crop Disease Detection course project.
+Built for IVA CIA-3 (Objective 3).
